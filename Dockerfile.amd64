@@ -47,9 +47,11 @@ RUN apt update \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
-
-# Additional packages require ~600MB
-# libreoffice  pinta language-pack-zh-hant language-pack-gnome-zh-hant firefox-locale-zh-hant libreoffice-l10n-zh-tw
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends --allow-unauthenticated \
+        curl libfreetype6 libglu1-mesa libxi6 libxrender1 xz-utils \
+    && apt-get -y autoremove \
+    && rm -rf /var/lib/apt/lists/*
 
 # tini to fix subreap
 ARG TINI_VERSION=v0.18.0
@@ -77,6 +79,16 @@ RUN apt-get update \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt/* /tmp/a.txt /tmp/b.txt
+
+## Go fetch Blender3D v2.90 from clarkson.edu
+ENV BLENDER_MAJOR 2.90
+ENV BLENDER_VERSION 2.90.0
+ENV BASE_URL https://mirror.clarkson.edu/blender/release
+ENV BLENDER_URL ${BASE_URL}/Blender${BLENDER_MAJOR}/blender-${BLENDER_VERSION}-linux64.tar.xz
+
+## copy onto /usr/local/blender
+RUN curl -L ${BLENDER_URL} | tar -xJ -C /usr/local/ && \
+	mv /usr/local/blender-${BLENDER_VERSION}-linux64 /usr/local/blender    
 
 
 ################################################################################
